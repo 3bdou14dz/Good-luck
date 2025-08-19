@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const gameData = {
-    icons: ["🎁", "💰", "💌", "⭐", "🍒", "🍀", "🎯", "🏆"],
+    icons: ["🎁", "🎃", "💌", "⭐", "🍒", "🍀", "🎯", "🏆"],
     score: 0,
     attempts: 3,
     lastSpinTime: 0,
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function getWeightedRandomIcon() {
     const rand = Math.random();
     if (rand < 0.0001) return "💌";
-    else if (rand < 0.3) return "💰";
+    else if (rand < 0.3) return "🎃";
     else if (rand < 0.6) return "🎁";
     else if (rand < 0.75) return "⭐";
     else if (rand < 0.85) return "🍒";
@@ -171,10 +171,10 @@ document.addEventListener('DOMContentLoaded', () => {
       points = 30;
       showPrizeModal("3 هدايا! مبروك!", points);
       message = "🎁🎁🎁 ربحت 30 نقطة!";
-    } else if (a === "💰" && b === "💰" && c === "💰") {
+    } else if (a === "🎃" && b === "🎃" && c === "🎃") {
       points = 100;
       showPrizeModal("3 أموال! مبروك!", points);
-      message = "💰💰💰 ربحت 100 نقطة!";
+      message = "🎃🎃🎃 ربحت 100 نقطة!";
     } else if (a === "💌" && b === "💌" && c === "💌") {
       points = 500;
       showPrizeModal("الجائزة الكبرى! 3 قلوب! مبروك!", points);
@@ -220,3 +220,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initGame();
 });
+
