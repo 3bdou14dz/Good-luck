@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const gameData = {
-    icons: ["🎁", "🎃", "💌", "⭐", "🍒", "🍀", "🎯", "🏆"],
+    icons: ["🎁", "🎃", "💌", "⭐", "🍒", "🍀", "🎯", "🏆"], // 🎃 بدل 💰
     score: 0,
     attempts: 3,
     lastSpinTime: 0,
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ✅ تحميل البيانات بشكل صحيح مع مراعاة 0
+  // ✅ تحميل البيانات مع فحص 8 ساعات
   function loadGameData() {
     const savedData = localStorage.getItem('slotGameData');
     if (savedData) {
@@ -77,8 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
       gameData.attempts = (parsedData.attempts !== undefined) ? parsedData.attempts : 3;
       gameData.lastSpinTime = parsedData.lastSpinTime ?? 0;
       gameData.firstVisit = parsedData.firstVisit !== false;
+
+      // فحص إعادة المحاولات بعد 8 ساعات
+      checkAttemptsReset();
     } else {
-      // أول زيارة فقط
       gameData.score = 0;
       gameData.attempts = 3;
       gameData.lastSpinTime = 0;
@@ -97,13 +99,25 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('slotGameData', JSON.stringify(dataToSave));
   }
 
+  function checkAttemptsReset() {
+    const now = Date.now();
+    const eightHours = 8 * 60 * 60 * 1000;
+
+    if (gameData.attempts === 0 && gameData.lastSpinTime > 0) {
+      if (now - gameData.lastSpinTime >= eightHours) {
+        gameData.attempts = 3;
+        saveGameData();
+      }
+    }
+  }
+
   function updateUI() {
     elements.scoreDisplay.textContent = gameData.score;
     elements.attemptsDisplay.textContent = gameData.attempts;
 
     if (gameData.attempts <= 0) {
       elements.spinBtn.disabled = true;
-      elements.timerDisplay.textContent = "❌ انتهت محاولاتك، لا يمكنك اللعب مجدداً.";
+      elements.timerDisplay.textContent = "⏳ انتهت محاولاتك، ستعود بعد 8 ساعات من آخر سحب.";
     } else {
       elements.spinBtn.disabled = false;
       elements.timerDisplay.textContent = "";
@@ -147,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function getWeightedRandomIcon() {
     const rand = Math.random();
     if (rand < 0.0001) return "💌";
-    else if (rand < 0.3) return "🎃";
+    else if (rand < 0.3) return "🎃"; // 🎃 بدل 💰
     else if (rand < 0.6) return "🎁";
     else if (rand < 0.75) return "⭐";
     else if (rand < 0.85) return "🍒";
@@ -171,9 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
       points = 30;
       showPrizeModal("3 هدايا! مبروك!", points);
       message = "🎁🎁🎁 ربحت 30 نقطة!";
-    } else if (a === "🎃" && b === "🎃" && c === "🎃") {
+    } else if (a === "🎃" && b === "🎃" && c === "🎃") { // 🎃 بدل 💰
       points = 100;
-      showPrizeModal("3 أموال! مبروك!", points);
+      showPrizeModal("3 قرعات! مبروك!", points);
       message = "🎃🎃🎃 ربحت 100 نقطة!";
     } else if (a === "💌" && b === "💌" && c === "💌") {
       points = 500;
@@ -220,4 +234,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initGame();
 });
-
