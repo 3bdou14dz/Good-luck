@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const gameData = {
-    icons: ["🎁", "🎃", "💌", "⭐", "🍒", "🍀", "🎯", "🏆"], // 🎃 بدل 💰
+    icons: ["🎁", "🎃", "💌", "⭐", "🍒", "🍀", "🎯", "🏆"],
     score: 0,
     attempts: 3,
     lastSpinTime: 0,
@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateUI();
     setupEventListeners();
+    checkAttemptsReset();
   }
 
   function showWelcomeModal() {
@@ -38,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.innerHTML = `
       <div class="modal-content">
         <h2>مرحباً بك في آلة الحظ الذهبية!</h2>
-        <p>لقد حصلت على 500 نقطة ترحيبية كهدية!</p>
+        <p>لعبة ترفيهية مسلية، لقد حصلت على 500 نقطة ترحيبية!</p>
         <button class="modal-btn" id="welcome-ok-btn">موافق</button>
       </div>
     `;
@@ -68,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ✅ تحميل البيانات مع فحص 8 ساعات
   function loadGameData() {
     const savedData = localStorage.getItem('slotGameData');
     if (savedData) {
@@ -77,9 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
       gameData.attempts = (parsedData.attempts !== undefined) ? parsedData.attempts : 3;
       gameData.lastSpinTime = parsedData.lastSpinTime ?? 0;
       gameData.firstVisit = parsedData.firstVisit !== false;
-
-      // فحص إعادة المحاولات بعد 8 ساعات
-      checkAttemptsReset();
     } else {
       gameData.score = 0;
       gameData.attempts = 3;
@@ -107,6 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (now - gameData.lastSpinTime >= eightHours) {
         gameData.attempts = 3;
         saveGameData();
+        updateUI();
+      } else {
+        // عرض وقت الانتظار المتبقي
+        const timeLeft = eightHours - (now - gameData.lastSpinTime);
+        const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
+        const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        
+        elements.timerDisplay.textContent = `⏳ المحاولات ستعود بعد: ${hoursLeft} ساعة و ${minutesLeft} دقيقة`;
       }
     }
   }
@@ -117,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (gameData.attempts <= 0) {
       elements.spinBtn.disabled = true;
-      elements.timerDisplay.textContent = "⏳ انتهت محاولاتك، ستعود بعد 8 ساعات من آخر سحب.";
+      checkAttemptsReset(); // تحديث العداد
     } else {
       elements.spinBtn.disabled = false;
       elements.timerDisplay.textContent = "";
@@ -161,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function getWeightedRandomIcon() {
     const rand = Math.random();
     if (rand < 0.0001) return "💌";
-    else if (rand < 0.3) return "🎃"; // 🎃 بدل 💰
+    else if (rand < 0.3) return "🎃";
     else if (rand < 0.6) return "🎁";
     else if (rand < 0.75) return "⭐";
     else if (rand < 0.85) return "🍒";
@@ -179,13 +184,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function checkWin(results) {
     const [a, b, c] = results;
     let points = 0;
-    let message = "😢 لم تفز هذه المرة!";
+    let message = "😢 لم تفز هذه المرة! حاول مرة أخرى";
 
     if (a === "🎁" && b === "🎁" && c === "🎁") {
       points = 30;
       showPrizeModal("3 هدايا! مبروك!", points);
       message = "🎁🎁🎁 ربحت 30 نقطة!";
-    } else if (a === "🎃" && b === "🎃" && c === "🎃") { // 🎃 بدل 💰
+    } else if (a === "🎃" && b === "🎃" && c === "🎃") {
       points = 100;
       showPrizeModal("3 قرعات! مبروك!", points);
       message = "🎃🎃🎃 ربحت 100 نقطة!";
@@ -217,13 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function showJackpotInfo() {
     elements.contactInfo.innerHTML = `
       <h3>مبروك! لقد فزت بالجائزة الكبرى!</h3>
-      <p>الجائزة: حساب أمريكي مميز مع نقاط تشغيل</p>
-      <div class="contact-buttons">
-        <a href="https://wa.me/213664890575?text=لقد%20فزت%20بالجائزة%20الكبرى%20في%20آلة%20الحظ%20الذهبية" 
-           class="contact-btn whatsapp">تواصل عبر الواتساب</a>
-        <a href="https://t.me/+213664890575" class="contact-btn telegram">تواصل عبر تيليجرام</a>
-      </div>
-      <p>يرجى إرسال لقطة الشاشة كدليل للفوز</p>
+      <p>هذه الجائزة افتراضية للتسلية فقط</p>
     `;
     elements.contactInfo.style.display = "block";
   }
